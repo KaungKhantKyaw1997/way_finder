@@ -1,0 +1,37 @@
+name: way_finder
+description: "A new Flutter project."
+publish_to: "none"
+version: 1.0.53+58
+
+environment:
+  sdk: ">=3.2.6 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  shared_preferences: ^2.2.2
+  google_fonts: ^6.2.1
+  flutter_svg: ^2.0.10+1
+  shimmer: ^3.0.0
+  change_app_package_name: ^1.1.0
+  flutter_launcher_icons: ^0.13.1
+  flutter_map: ^6.1.0
+  flutter_map_cancellable_tile_provider: ^2.0.0
+  latlong2: ^0.9.1
+  location: ^6.0.1
+  fluttertoast: ^8.2.4
+  dio: ^5.4.2+1
+  flutter_osm_plugin: ^0.70.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
