@@ -31,11 +31,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final Dio _dio = Dio();
   List suggestions = [];
   bool showSuggestion = false;
+  List coordinates = [];
   List<LatLng> directions = [];
   double endLatitude = 0.0;
   double endLongitude = 0.0;
   double duration = 0.0;
   double distance = 0.0;
+  bool checkCar = true;
+  bool checkBicycle = false;
+  bool checkFoot = false;
 
   @override
   void initState() {
@@ -159,13 +163,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
   }
 
-  getRoute(coordinates) async {
+  getRoute() async {
     try {
       String origin = '$longitude,$latitude';
       String destination = '${coordinates[0]},${coordinates[1]}';
 
+      String routeType = checkCar
+          ? 'routed-car'
+          : checkBicycle
+              ? 'routed-bike'
+              : 'routed-foot';
       var response = await _dio.get(
-        '${ApiConstant.DIRECTION_URL}/routed-car/route/v1/driving/$origin;$destination?overview=false&geometries=polyline&steps=true',
+        '${ApiConstant.DIRECTION_URL}/$routeType/route/v1/driving/$origin;$destination?overview=false&geometries=polyline&steps=true',
         options: Options(
           headers: {
             'Content-Type': 'application/json; charset=UTF-8',
@@ -216,7 +225,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           showSuggestion = false;
           search.text = suggestions[index]['properties']['name'].toString();
         });
-        getRoute(suggestions[index]['geometry']['coordinates']);
+        coordinates = suggestions[index]['geometry']['coordinates'];
+        getRoute();
       },
       child: Column(
         children: [
@@ -398,11 +408,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               bottom: 132,
               left: 15,
               child: FloatingActionButton(
-                onPressed: () => {},
+                onPressed: () {
+                  setState(() {
+                    checkCar = true;
+                    checkBicycle = false;
+                    checkFoot = false;
+                  });
+                  getRoute();
+                },
                 backgroundColor: Colors.white,
                 shape: const CircleBorder(),
                 child: SvgPicture.asset(
                   'assets/icons/car.svg',
+                  colorFilter: ColorFilter.mode(
+                    checkCar ? const Color(0xff007AFF) : Colors.black,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
             ),
@@ -410,11 +431,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               bottom: 132,
               left: 125,
               child: FloatingActionButton(
-                onPressed: () => {},
+                onPressed: () {
+                  setState(() {
+                    checkCar = false;
+                    checkBicycle = true;
+                    checkFoot = false;
+                  });
+                  getRoute();
+                },
                 backgroundColor: Colors.white,
                 shape: const CircleBorder(),
                 child: SvgPicture.asset(
                   'assets/icons/bicycle.svg',
+                  colorFilter: ColorFilter.mode(
+                    checkBicycle ? const Color(0xff007AFF) : Colors.black,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
             ),
@@ -422,11 +454,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               bottom: 132,
               left: 245,
               child: FloatingActionButton(
-                onPressed: () => {},
+                onPressed: () {
+                  setState(() {
+                    checkCar = false;
+                    checkBicycle = false;
+                    checkFoot = true;
+                  });
+                  getRoute();
+                },
                 backgroundColor: Colors.white,
                 shape: const CircleBorder(),
                 child: SvgPicture.asset(
-                  'assets/icons/walk.svg',
+                  'assets/icons/foot.svg',
+                  colorFilter: ColorFilter.mode(
+                    checkFoot ? const Color(0xff007AFF) : Colors.black,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
             ),
