@@ -32,6 +32,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   List suggestions = [];
   bool showSuggestion = false;
   List<LatLng> directions = [];
+  double endLatitude = 0.0;
+  double endLongitude = 0.0;
 
   @override
   void initState() {
@@ -136,11 +138,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         ),
         queryParameters: {
           'q': search.text,
-          'limit': 10,
+          'limit': 20,
         },
       );
       if (response.statusCode == 200) {
         suggestions = [];
+        print(response.data['features'].length);
         if (response.data.isNotEmpty) {
           suggestions = response.data['features'];
         }
@@ -170,6 +173,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       );
       if (response.statusCode == 200) {
         directions = [];
+        endLatitude = 0.0;
+        endLongitude = 0.0;
         if (response.data.isNotEmpty) {
           final List steps = response.data['routes'][0]['legs'][0]['steps'];
           for (var step in steps) {
@@ -178,8 +183,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   step['intersections'][i]['location'][0]));
             }
           }
+          endLatitude = directions[directions.length - 1].latitude;
+          endLongitude = directions[directions.length - 1].longitude;
         }
-        print(directions.length);
         setState(() {});
       } else {
         throw Exception('Failed to get directions');
@@ -237,6 +243,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
+  Marker buildEndPin(LatLng point) => Marker(
+        point: point,
+        width: 30,
+        height: 30,
+        child: SvgPicture.asset(
+          "assets/icons/end_location.svg",
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -259,35 +274,54 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
               children: [
                 openStreetMapTileLayer,
+                PolylineLayer(
+                  polylines: [
+                    Polyline(
+                      points: directions,
+                      strokeWidth: 10,
+                      color: const Color(0xff60B593).withOpacity(0.7),
+                      borderStrokeWidth: 0,
+                    ),
+                  ],
+                ),
                 CircleLayer(
                   circles: [
                     CircleMarker(
                       point: LatLng(latitude, longitude),
                       color: const Color(0xff007AFF),
                       borderColor: Colors.white,
-                      borderStrokeWidth: 4,
+                      borderStrokeWidth: 3,
                       useRadiusInMeter: true,
                       radius: 10,
                     ),
                     CircleMarker(
                       point: LatLng(latitude, longitude),
-                      color: const Color(0xff007AFF).withOpacity(0.3),
+                      color: const Color(0xff007AFF).withOpacity(0.4),
                       borderStrokeWidth: 0,
                       useRadiusInMeter: true,
                       radius: 70,
                     ),
                   ],
                 ),
-                PolylineLayer(
-                  polylines: [
-                    Polyline(
-                      points: directions,
-                      strokeWidth: 8,
-                      color: const Color(0xff007AFF),
-                      borderStrokeWidth: 0,
+                CircleLayer(
+                  circles: [
+                    CircleMarker(
+                      point: LatLng(endLatitude, endLongitude),
+                      color: const Color(0xffCE534C),
+                      borderColor: Colors.white,
+                      borderStrokeWidth: 3,
+                      useRadiusInMeter: true,
+                      radius: 10,
                     ),
                   ],
                 ),
+                // MarkerLayer(
+                //   markers: [
+                //     buildEndPin(
+                //       LatLng(endLatitude, endLongitude),
+                //     ),
+                //   ],
+                // ),
                 MapButtons(
                   mapController: mapController,
                   minZoom: 4,
