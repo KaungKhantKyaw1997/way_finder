@@ -34,6 +34,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   List<LatLng> directions = [];
   double endLatitude = 0.0;
   double endLongitude = 0.0;
+  double duration = 0.0;
+  double distance = 0.0;
 
   @override
   void initState() {
@@ -143,7 +145,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       );
       if (response.statusCode == 200) {
         suggestions = [];
-        print(response.data['features'].length);
         if (response.data.isNotEmpty) {
           suggestions = response.data['features'];
         }
@@ -176,6 +177,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         endLatitude = 0.0;
         endLongitude = 0.0;
         if (response.data.isNotEmpty) {
+          duration = response.data['routes'][0]['duration'];
+          distance = response.data['routes'][0]['distance'];
           final List steps = response.data['routes'][0]['legs'][0]['steps'];
           for (var step in steps) {
             for (int i = 0; i < step['intersections'].length; i++) {
@@ -219,7 +222,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         children: [
           ListTile(
             title: Text(
-              suggestions[index]['properties']['name'].toString(),
+              suggestions[index]['properties']['name'] ?? "",
               style: Theme.of(context).textTheme.labelLarge,
             ),
             subtitle: Text(
@@ -391,6 +394,86 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                 ),
               ),
+            Positioned(
+              bottom: 132,
+              left: 15,
+              child: FloatingActionButton(
+                onPressed: () => {},
+                backgroundColor: Colors.white,
+                shape: const CircleBorder(),
+                child: SvgPicture.asset(
+                  'assets/icons/car.svg',
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 132,
+              left: 125,
+              child: FloatingActionButton(
+                onPressed: () => {},
+                backgroundColor: Colors.white,
+                shape: const CircleBorder(),
+                child: SvgPicture.asset(
+                  'assets/icons/bicycle.svg',
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 132,
+              left: 245,
+              child: FloatingActionButton(
+                onPressed: () => {},
+                backgroundColor: Colors.white,
+                shape: const CircleBorder(),
+                child: SvgPicture.asset(
+                  'assets/icons/walk.svg',
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 30,
+              left: 15,
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                height: 75,
+                width: 290,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(15),
+                  color: Colors.white,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Duration",
+                          style: Theme.of(context).textTheme.labelSmall,
+                        ),
+                        Text(
+                          duration.toString(),
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Distance",
+                          style: Theme.of(context).textTheme.labelSmall,
+                        ),
+                        Text(
+                          distance.toString(),
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
