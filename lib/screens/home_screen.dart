@@ -409,6 +409,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               left: 15,
               child: FloatingActionButton(
                 onPressed: () {
+                  _animatedMapMove(latitude, longitude, 16.5);
                   setState(() {
                     checkCar = true;
                     checkBicycle = false;
@@ -432,6 +433,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               left: 125,
               child: FloatingActionButton(
                 onPressed: () {
+                  _animatedMapMove(latitude, longitude, 16.5);
                   setState(() {
                     checkCar = false;
                     checkBicycle = true;
@@ -455,6 +457,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               left: 245,
               child: FloatingActionButton(
                 onPressed: () {
+                  _animatedMapMove(latitude, longitude, 16.5);
                   setState(() {
                     checkCar = false;
                     checkBicycle = false;
