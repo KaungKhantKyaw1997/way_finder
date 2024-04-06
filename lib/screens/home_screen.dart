@@ -31,12 +31,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   final Dio _dio = Dio();
   List suggestions = [];
   bool showSuggestion = false;
+  List<LatLng> directions = [];
 
   @override
   void initState() {
     super.initState();
     mapController = MapController();
-    listenLocation();
+    // listenLocation();
   }
 
   @override
@@ -138,13 +139,51 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           'limit': 10,
         },
       );
-      suggestions = [];
-      if (response.data.isNotEmpty) {
-        suggestions = response.data['features'];
+      if (response.statusCode == 200) {
+        suggestions = [];
+        if (response.data.isNotEmpty) {
+          suggestions = response.data['features'];
+        }
+        setState(() {
+          showSuggestion = true;
+        });
+      } else {
+        throw Exception('Failed to get suggestion address');
       }
-      setState(() {
-        showSuggestion = true;
-      });
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  getRoute(coordinates) async {
+    try {
+      String origin = '$longitude,$latitude';
+      String destination = '${coordinates[0]},${coordinates[1]}';
+
+      var response = await _dio.get(
+        '${ApiConstant.DIRECTION_URL}/routed-car/route/v1/driving/$origin;$destination?overview=false&geometries=polyline&steps=true',
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+        ),
+      );
+      if (response.statusCode == 200) {
+        directions = [];
+        if (response.data.isNotEmpty) {
+          final List steps = response.data['routes'][0]['legs'][0]['steps'];
+          for (var step in steps) {
+            for (int i = 0; i < step['intersections'].length; i++) {
+              directions.add(LatLng(step['intersections'][i]['location'][1],
+                  step['intersections'][i]['location'][0]));
+            }
+          }
+        }
+        print(directions.length);
+        setState(() {});
+      } else {
+        throw Exception('Failed to get directions');
+      }
     } catch (e) {
       print('Error: $e');
     }
@@ -168,8 +207,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           showSuggestion = false;
           search.text = suggestions[index]['properties']['name'].toString();
         });
-        _animatedMapMove(suggestions[index]['geometry']['coordinates'][0],
-            suggestions[index]['geometry']['coordinates'][1], 16.5);
+        getRoute(suggestions[index]['geometry']['coordinates']);
       },
       child: Column(
         children: [
@@ -240,6 +278,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ),
                   ],
                 ),
+                PolylineLayer(
+                  polylines: [
+                    Polyline(
+                      points: directions,
+                      strokeWidth: 8,
+                      color: const Color(0xff007AFF),
+                      borderStrokeWidth: 0,
+                    ),
+                  ],
+                ),
                 MapButtons(
                   mapController: mapController,
                   minZoom: 4,
@@ -269,7 +317,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 style: Theme.of(context).textTheme.bodyLarge,
                 cursorColor: Theme.of(context).primaryColor,
                 decoration: InputDecoration(
-                  fillColor: Colors.white,
+                  fillColor: Colors.white.withOpacity(0.9),
                   hintText: 'Search Maps',
                   suffixIcon: IconButton(
                     onPressed: () async {

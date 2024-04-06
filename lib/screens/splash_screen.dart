@@ -10,7 +10,7 @@ class SplashScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Timer(const Duration(seconds: 3), () async {
-      await getLocation();
+      // await getLocation();
       Navigator.of(context).pushReplacementNamed('/home');
     });
 
