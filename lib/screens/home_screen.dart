@@ -218,6 +218,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return '$district$state$city$country';
   }
 
+  String metersToKilometers(meters) {
+    double kilometers = meters / 1000;
+    return '${kilometers.toStringAsFixed(1)} km';
+  }
+
+  String secondsToHoursMinutesSeconds(double seconds) {
+    int totalSeconds = seconds.toInt();
+    int hours = (totalSeconds ~/ 3600);
+    int remainingSeconds = totalSeconds % 3600;
+    int minutes = (remainingSeconds ~/ 60);
+    int remainingSecondsFinal = remainingSeconds % 60;
+    return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${remainingSecondsFinal.toString().padLeft(2, '0')}';
+  }
+
   suggestionCard(index) {
     return GestureDetector(
       onTap: () {
@@ -494,11 +508,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Duration",
+                          "Distance",
                           style: Theme.of(context).textTheme.labelSmall,
                         ),
                         Text(
-                          duration.toString(),
+                          metersToKilometers(distance),
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                       ],
@@ -507,11 +521,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Distance",
+                          "Duration",
                           style: Theme.of(context).textTheme.labelSmall,
                         ),
                         Text(
-                          distance.toString(),
+                          secondsToHoursMinutesSeconds(duration),
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                       ],
