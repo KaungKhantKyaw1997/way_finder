@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:io';
+import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -40,12 +40,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   bool checkCar = true;
   bool checkBicycle = false;
   bool checkFoot = false;
+  final LatLng startingPoint =
+      LatLng(16.844936, 96.132378); // Starting point coordinates
+  List<Map<String, dynamic>> intersections = [
+    // List of intersections
+    {
+      "location": LatLng(16.844936, 96.132378),
+      "bearings": [45, 135, 225],
+      "maneuver": {"modifier": "left"}
+    },
+    // Add more intersections as needed
+  ];
 
   @override
   void initState() {
     super.initState();
     mapController = MapController();
     // listenLocation();
+    _buildPolylines();
   }
 
   @override
@@ -59,13 +71,33 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  bool isSimulator() {
-    if (Platform.isAndroid || Platform.isIOS) {
-      return Platform.environment['SIMULATOR'] != null ||
-          Platform.environment['EMULATOR'] != null;
-    } else {
-      return false;
-    }
+  _buildPolylines() {
+    List<LatLng> routeCoordinates = [startingPoint];
+    LatLng currentPoint = startingPoint;
+
+    // Calculate route based on intersections and maneuvers
+    intersections.forEach((intersection) {
+      double bearing = intersection['bearings'][0].toDouble();
+      String maneuver = intersection['maneuver']['modifier'];
+
+      // Adjust the direction of travel based on the maneuver
+      if (maneuver == 'left') {
+        bearing += 90; // Turn left
+      } else if (maneuver == 'right') {
+        bearing -= 90; // Turn right
+      }
+
+      // Calculate new point based on current point, bearing, and distance
+      double lat = currentPoint.latitude + 0.0001 * cos(bearing * pi / 180);
+      double lng = currentPoint.longitude + 0.0001 * sin(bearing * pi / 180);
+      LatLng newPoint = LatLng(lat, lng);
+
+      // Add new point to route coordinates
+      routeCoordinates.add(newPoint);
+      currentPoint = newPoint;
+    });
+    print(routeCoordinates);
+    print("------------------------------------------------------");
   }
 
   Future<void> listenLocation() async {
@@ -164,47 +196,49 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   getRoute() async {
-    try {
-      String origin = '$longitude,$latitude';
-      String destination = '${coordinates[0]},${coordinates[1]}';
+    directions = [LatLng(16.844936, 96.132378), LatLng(16.844865, 96.132449)];
+    // try {
+    //   String origin = '$longitude,$latitude';
+    //   String destination = '${coordinates[0]},${coordinates[1]}';
 
-      String routeType = checkCar
-          ? 'routed-car'
-          : checkBicycle
-              ? 'routed-bike'
-              : 'routed-foot';
-      var response = await _dio.get(
-        '${ApiConstant.DIRECTION_URL}/$routeType/route/v1/driving/$origin;$destination?overview=false&geometries=polyline&steps=true',
-        options: Options(
-          headers: {
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-        ),
-      );
-      if (response.statusCode == 200) {
-        directions = [];
-        endLatitude = 0.0;
-        endLongitude = 0.0;
-        if (response.data.isNotEmpty) {
-          duration = response.data['routes'][0]['duration'];
-          distance = response.data['routes'][0]['distance'];
-          final List steps = response.data['routes'][0]['legs'][0]['steps'];
-          for (var step in steps) {
-            for (int i = 0; i < step['intersections'].length; i++) {
-              directions.add(LatLng(step['intersections'][i]['location'][1],
-                  step['intersections'][i]['location'][0]));
-            }
-          }
-          endLatitude = directions[directions.length - 1].latitude;
-          endLongitude = directions[directions.length - 1].longitude;
-        }
-        setState(() {});
-      } else {
-        throw Exception('Failed to get directions');
-      }
-    } catch (e) {
-      print('Error: $e');
-    }
+    //   String routeType = checkCar
+    //       ? 'routed-car'
+    //       : checkBicycle
+    //           ? 'routed-bike'
+    //           : 'routed-foot';
+    //   var response = await _dio.get(
+    //     '${ApiConstant.DIRECTION_URL}/$routeType/route/v1/driving/$origin;$destination?overview=false&geometries=polyline&steps=true',
+    //     options: Options(
+    //       headers: {
+    //         'Content-Type': 'application/json; charset=UTF-8',
+    //       },
+    //     ),
+    //   );
+    //   if (response.statusCode == 200) {
+    //     directions = [];
+    //     endLatitude = 0.0;
+    //     endLongitude = 0.0;
+    //     if (response.data.isNotEmpty) {
+    //       duration = response.data['routes'][0]['duration'];
+    //       distance = response.data['routes'][0]['distance'];
+    //       final List steps = response.data['routes'][0]['legs'][0]['steps'];
+    //       print(steps);
+    //       for (var step in steps) {
+    //         for (int i = 0; i < step['intersections'].length; i++) {
+    //           directions.add(LatLng(step['intersections'][i]['location'][1],
+    //               step['intersections'][i]['location'][0]));
+    //         }
+    //       }
+    //       endLatitude = directions[directions.length - 1].latitude;
+    //       endLongitude = directions[directions.length - 1].longitude;
+    //     }
+    //     setState(() {});
+    //   } else {
+    //     throw Exception('Failed to get directions');
+    //   }
+    // } catch (e) {
+    //   print('Error: $e');
+    // }
   }
 
   getAddress(properties) {
