@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -285,9 +284,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 initialCenter: LatLng(latitude, longitude),
                 initialZoom: 16.5,
                 onPositionChanged: (position, hasGesture) {
-                  setState(() {
-                    isCurrentLocation = false;
-                  });
+                  if (hasGesture && isCurrentLocation) {
+                    setState(() {
+                      isCurrentLocation = false;
+                    });
+                  }
                 },
               ),
               children: [
@@ -344,13 +345,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   mapController: mapController,
                   minZoom: 4,
                   maxZoom: 19,
-                  isCurrentLocation: isCurrentLocation,
-                  onPressed: () {
-                    setState(() {
-                      isCurrentLocation = true;
-                    });
-                    _animatedMapMove(latitude, longitude, 16.5);
-                  },
                 ),
               ],
             ),
@@ -381,6 +375,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ),
                   ),
                 ),
+                onFieldSubmitted: (value) {
+                  searchFocusNode.unfocus();
+                  getSuggestionAddress();
+                },
               ),
             ),
             if (showSuggestion)
@@ -409,124 +407,215 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                 ),
               ),
-            Positioned(
-              bottom: 132,
-              left: 15,
-              child: FloatingActionButton(
-                onPressed: () {
-                  _animatedMapMove(latitude, longitude, 16.5);
-                  setState(() {
-                    checkCar = true;
-                    checkBicycle = false;
-                    checkFoot = false;
-                  });
-                  getRoute();
-                },
-                backgroundColor: Colors.white,
-                shape: const CircleBorder(),
-                child: SvgPicture.asset(
-                  'assets/icons/car.svg',
-                  colorFilter: ColorFilter.mode(
-                    checkCar ? const Color(0xff007AFF) : Colors.black,
-                    BlendMode.srcIn,
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 132,
-              left: 125,
-              child: FloatingActionButton(
-                onPressed: () {
-                  _animatedMapMove(latitude, longitude, 16.5);
-                  setState(() {
-                    checkCar = false;
-                    checkBicycle = true;
-                    checkFoot = false;
-                  });
-                  getRoute();
-                },
-                backgroundColor: Colors.white,
-                shape: const CircleBorder(),
-                child: SvgPicture.asset(
-                  'assets/icons/bicycle.svg',
-                  colorFilter: ColorFilter.mode(
-                    checkBicycle ? const Color(0xff007AFF) : Colors.black,
-                    BlendMode.srcIn,
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 132,
-              left: 245,
-              child: FloatingActionButton(
-                onPressed: () {
-                  _animatedMapMove(latitude, longitude, 16.5);
-                  setState(() {
-                    checkCar = false;
-                    checkBicycle = false;
-                    checkFoot = true;
-                  });
-                  getRoute();
-                },
-                backgroundColor: Colors.white,
-                shape: const CircleBorder(),
-                child: SvgPicture.asset(
-                  'assets/icons/foot.svg',
-                  colorFilter: ColorFilter.mode(
-                    checkFoot ? const Color(0xff007AFF) : Colors.black,
-                    BlendMode.srcIn,
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 30,
-              left: 15,
-              child: Container(
-                padding: const EdgeInsets.all(16),
-                height: 75,
-                width: 290,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(15),
-                  color: Colors.white,
-                ),
+          ],
+        ),
+        floatingActionButton: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16,
+          ),
+          width: double.infinity,
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              Expanded(
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Distance",
-                          style: Theme.of(context).textTheme.labelSmall,
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(
+                            15,
+                          ),
+                          border: checkCar
+                              ? Border.all(
+                                  color: const Color(0xff007AFF),
+                                  width: 0.5,
+                                )
+                              : null,
                         ),
-                        Text(
-                          metersToKilometers(distance),
-                          style: Theme.of(context).textTheme.titleLarge,
+                        width: double.infinity,
+                        child: FloatingActionButton(
+                          elevation: 0.1,
+                          backgroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          onPressed: () {
+                            _animatedMapMove(latitude, longitude, 16.5);
+                            setState(() {
+                              checkCar = true;
+                              checkBicycle = false;
+                              checkFoot = false;
+                            });
+                            getRoute();
+                          },
+                          child: SvgPicture.asset(
+                            'assets/icons/car.svg',
+                            colorFilter: ColorFilter.mode(
+                              checkCar ? const Color(0xff007AFF) : Colors.black,
+                              BlendMode.srcIn,
+                            ),
+                          ),
                         ),
-                      ],
+                      ),
                     ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Duration",
-                          style: Theme.of(context).textTheme.labelSmall,
+                    const SizedBox(
+                      width: 16,
+                    ),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(
+                            15,
+                          ),
+                          border: checkBicycle
+                              ? Border.all(
+                                  color: const Color(0xff007AFF),
+                                  width: 0.5,
+                                )
+                              : null,
                         ),
-                        Text(
-                          secondsToHoursMinutesSeconds(duration),
-                          style: Theme.of(context).textTheme.titleLarge,
+                        width: double.infinity,
+                        child: FloatingActionButton(
+                          elevation: 0.1,
+                          backgroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          onPressed: () {
+                            _animatedMapMove(latitude, longitude, 16.5);
+                            setState(() {
+                              checkCar = false;
+                              checkBicycle = true;
+                              checkFoot = false;
+                            });
+                            getRoute();
+                          },
+                          child: SvgPicture.asset(
+                            'assets/icons/bicycle.svg',
+                            colorFilter: ColorFilter.mode(
+                              checkBicycle
+                                  ? const Color(0xff007AFF)
+                                  : Colors.black,
+                              BlendMode.srcIn,
+                            ),
+                          ),
                         ),
-                      ],
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 16,
+                    ),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(
+                            15,
+                          ),
+                          border: checkFoot
+                              ? Border.all(
+                                  color: const Color(0xff007AFF),
+                                  width: 0.5,
+                                )
+                              : null,
+                        ),
+                        width: double.infinity,
+                        child: FloatingActionButton(
+                          elevation: 0.1,
+                          backgroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          onPressed: () {
+                            _animatedMapMove(latitude, longitude, 16.5);
+                            setState(() {
+                              checkCar = false;
+                              checkBicycle = false;
+                              checkFoot = true;
+                            });
+                            getRoute();
+                          },
+                          child: SvgPicture.asset(
+                            'assets/icons/foot.svg',
+                            colorFilter: ColorFilter.mode(
+                              checkFoot
+                                  ? const Color(0xff007AFF)
+                                  : Colors.black,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
-            ),
-          ],
+              const SizedBox(
+                height: 8,
+              ),
+              Expanded(
+                child: Row(
+                  children: [
+                    Expanded(
+                      flex: 5,
+                      child: FloatingActionButton(
+                        elevation: 0.1,
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        onPressed: null,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                metersToKilometers(distance),
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                              Text(
+                                secondsToHoursMinutesSeconds(duration),
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 16,
+                    ),
+                    Expanded(
+                      child: FloatingActionButton(
+                        elevation: 0.1,
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            isCurrentLocation = true;
+                          });
+                          _animatedMapMove(latitude, longitude, 16.5);
+                        },
+                        child: SvgPicture.asset(
+                          isCurrentLocation
+                              ? 'assets/icons/fill_navigate.svg'
+                              : 'assets/icons/navigate.svg',
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       ),
     );
   }
