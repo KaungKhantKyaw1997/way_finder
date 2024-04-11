@@ -3,8 +3,10 @@
 import 'package:location/location.dart';
 
 final Location location = Location();
-double latitude = 16.84630;
-double longitude = 96.13210;
+// double latitude = 16.84630;
+// double longitude = 96.13210;
+double latitude = 0.0;
+double longitude = 0.0;
 
 Future<void> getLocation() async {
   try {
