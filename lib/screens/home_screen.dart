@@ -40,17 +40,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   bool checkCar = true;
   bool checkBicycle = false;
   bool checkFoot = false;
-  final LatLng startingPoint =
-      LatLng(16.844936, 96.132378); // Starting point coordinates
-  List<Map<String, dynamic>> intersections = [
-    // List of intersections
-    {
-      "location": LatLng(16.844936, 96.132378),
-      "bearings": [45, 135, 225],
-      "maneuver": {"modifier": "left"}
-    },
-    // Add more intersections as needed
-  ];
 
   @override
   void initState() {
@@ -68,25 +57,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     });
     searchFocusNode.dispose();
     super.dispose();
-  }
-
-  reverseCalc(double lat, double lng, double brng, double distance) {
-    final R = 6371e3; // Earth's radius in meters
-    final lat1 = lat * pi / 180; // Convert latitude to radians
-    final lng1 = lng * pi / 180; // Convert longitude to radians
-    final brngRad = brng * pi / 180; // Convert bearing to radians
-
-    final lat2 = asin(sin(lat1) * cos(distance / R) +
-        cos(lat1) * sin(distance / R) * cos(brngRad));
-    final lng2 = lng1 +
-        atan2(sin(brngRad) * sin(distance / R) * cos(lat1),
-            cos(distance / R) - sin(lat1) * sin(lat2));
-
-    // Convert back from radians to degrees
-    final lat2Deg = lat2 * 180 / pi;
-    final lng2Deg = lng2 * 180 / pi;
-
-    return '${lat2Deg}, ${lng2Deg}';
   }
 
   Future<void> listenLocation() async {
@@ -499,19 +469,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     checkFoot = true;
                   });
                   getRoute();
-
-// 45
-// 135
-// 225
-// 330
-
-                  // final lat = 16.845258; // Example latitude
-                  // final lng = 96.132772; // Example longitude
-                  // final brng = 225.0; // Example bearing in degrees
-                  // final distance = 330.1; // Example distance in meters
-
-                  // final result = reverseCalc(lat, lng, brng, distance);
-                  // print(result);
                 },
                 backgroundColor: Colors.white,
                 shape: const CircleBorder(),
