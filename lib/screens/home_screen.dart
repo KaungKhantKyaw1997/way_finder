@@ -57,7 +57,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     super.initState();
     mapController = MapController();
     // listenLocation();
-    _buildPolylines();
   }
 
   @override
@@ -71,33 +70,23 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  _buildPolylines() {
-    List<LatLng> routeCoordinates = [startingPoint];
-    LatLng currentPoint = startingPoint;
+  reverseCalc(double lat, double lng, double brng, double distance) {
+    final R = 6371e3; // Earth's radius in meters
+    final lat1 = lat * pi / 180; // Convert latitude to radians
+    final lng1 = lng * pi / 180; // Convert longitude to radians
+    final brngRad = brng * pi / 180; // Convert bearing to radians
 
-    // Calculate route based on intersections and maneuvers
-    intersections.forEach((intersection) {
-      double bearing = intersection['bearings'][0].toDouble();
-      String maneuver = intersection['maneuver']['modifier'];
+    final lat2 = asin(sin(lat1) * cos(distance / R) +
+        cos(lat1) * sin(distance / R) * cos(brngRad));
+    final lng2 = lng1 +
+        atan2(sin(brngRad) * sin(distance / R) * cos(lat1),
+            cos(distance / R) - sin(lat1) * sin(lat2));
 
-      // Adjust the direction of travel based on the maneuver
-      if (maneuver == 'left') {
-        bearing += 90; // Turn left
-      } else if (maneuver == 'right') {
-        bearing -= 90; // Turn right
-      }
+    // Convert back from radians to degrees
+    final lat2Deg = lat2 * 180 / pi;
+    final lng2Deg = lng2 * 180 / pi;
 
-      // Calculate new point based on current point, bearing, and distance
-      double lat = currentPoint.latitude + 0.0001 * cos(bearing * pi / 180);
-      double lng = currentPoint.longitude + 0.0001 * sin(bearing * pi / 180);
-      LatLng newPoint = LatLng(lat, lng);
-
-      // Add new point to route coordinates
-      routeCoordinates.add(newPoint);
-      currentPoint = newPoint;
-    });
-    print(routeCoordinates);
-    print("------------------------------------------------------");
+    return '${lat2Deg}, ${lng2Deg}';
   }
 
   Future<void> listenLocation() async {
@@ -196,49 +185,47 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   getRoute() async {
-    directions = [LatLng(16.844936, 96.132378), LatLng(16.844865, 96.132449)];
-    // try {
-    //   String origin = '$longitude,$latitude';
-    //   String destination = '${coordinates[0]},${coordinates[1]}';
+    try {
+      String origin = '$longitude,$latitude';
+      String destination = '${coordinates[0]},${coordinates[1]}';
 
-    //   String routeType = checkCar
-    //       ? 'routed-car'
-    //       : checkBicycle
-    //           ? 'routed-bike'
-    //           : 'routed-foot';
-    //   var response = await _dio.get(
-    //     '${ApiConstant.DIRECTION_URL}/$routeType/route/v1/driving/$origin;$destination?overview=false&geometries=polyline&steps=true',
-    //     options: Options(
-    //       headers: {
-    //         'Content-Type': 'application/json; charset=UTF-8',
-    //       },
-    //     ),
-    //   );
-    //   if (response.statusCode == 200) {
-    //     directions = [];
-    //     endLatitude = 0.0;
-    //     endLongitude = 0.0;
-    //     if (response.data.isNotEmpty) {
-    //       duration = response.data['routes'][0]['duration'];
-    //       distance = response.data['routes'][0]['distance'];
-    //       final List steps = response.data['routes'][0]['legs'][0]['steps'];
-    //       print(steps);
-    //       for (var step in steps) {
-    //         for (int i = 0; i < step['intersections'].length; i++) {
-    //           directions.add(LatLng(step['intersections'][i]['location'][1],
-    //               step['intersections'][i]['location'][0]));
-    //         }
-    //       }
-    //       endLatitude = directions[directions.length - 1].latitude;
-    //       endLongitude = directions[directions.length - 1].longitude;
-    //     }
-    //     setState(() {});
-    //   } else {
-    //     throw Exception('Failed to get directions');
-    //   }
-    // } catch (e) {
-    //   print('Error: $e');
-    // }
+      String routeType = checkCar
+          ? 'driving-car'
+          : checkBicycle
+              ? 'cycling-regular'
+              : 'foot-walking';
+      var response = await _dio.get(
+        '${ApiConstant.DIRECTION_URL}/$routeType?api_key=${ApiConstant.DIRECTION_API_KEY}&start=$origin&end=$destination',
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+        ),
+      );
+      if (response.statusCode == 200) {
+        directions = [];
+        endLatitude = 0.0;
+        endLongitude = 0.0;
+        if (response.data.isNotEmpty) {
+          duration =
+              response.data['features'][0]['properties']['summary']['duration'];
+          distance =
+              response.data['features'][0]['properties']['summary']['distance'];
+          final List coordinates =
+              response.data['features'][0]['geometry']['coordinates'];
+          for (var coordinate in coordinates) {
+            directions.add(LatLng(coordinate[1], coordinate[0]));
+          }
+          endLatitude = directions[directions.length - 1].latitude;
+          endLongitude = directions[directions.length - 1].longitude;
+        }
+        setState(() {});
+      } else {
+        throw Exception('Failed to get directions');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
   }
 
   getAddress(properties) {
@@ -512,6 +499,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     checkFoot = true;
                   });
                   getRoute();
+
+// 45
+// 135
+// 225
+// 330
+
+                  // final lat = 16.845258; // Example latitude
+                  // final lng = 96.132772; // Example longitude
+                  // final brng = 225.0; // Example bearing in degrees
+                  // final distance = 330.1; // Example distance in meters
+
+                  // final result = reverseCalc(lat, lng, brng, distance);
+                  // print(result);
                 },
                 backgroundColor: Colors.white,
                 shape: const CircleBorder(),
