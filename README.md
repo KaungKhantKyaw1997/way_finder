@@ -50,7 +50,7 @@ Way Finder currently supports the following platforms:
 - iOS
 - Web
 
-## Features
+## Tools Used
 
 ---
 
