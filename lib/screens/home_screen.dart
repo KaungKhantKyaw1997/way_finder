@@ -299,13 +299,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     Polyline(
                       points: directions,
                       strokeWidth: 10,
-                      color: const Color(0xff60B593).withOpacity(0.7),
+                      color: const Color(0xff60B593).withOpacity(0.5),
                       borderStrokeWidth: 0,
                     ),
                   ],
                 ),
                 CurrentLocationLayer(
-                  alignPositionOnUpdate: AlignOnUpdate.always,
+                  alignPositionOnUpdate: AlignOnUpdate.once,
                   alignDirectionOnUpdate: AlignOnUpdate.never,
                   style: const LocationMarkerStyle(
                     marker: DefaultLocationMarker(
