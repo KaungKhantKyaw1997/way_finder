@@ -40,7 +40,7 @@ $ flutter pub get
 $ flutter run
 ```
 
-## Platform Support
+### Platform Support
 
 ---
 
@@ -50,14 +50,14 @@ Way Finder currently supports the following platforms:
 - iOS
 - Web
 
-## Tools Used
+### Tools Used
 
 ---
 
 1. **Open Street Map:** Utilized for detailed and up-to-date mapping data.
 2. **Open Route Service:** Integrated for accurate and reliable directions.
 
-## Features
+### Features
 
 ---
 
