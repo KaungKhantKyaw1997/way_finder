@@ -318,7 +318,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   position: LocationMarkerPosition(
                     latitude: endLatitude,
                     longitude: endLongitude,
-                    accuracy: 10,
+                    accuracy: 16,
                   ),
                   style: LocationMarkerStyle(
                     marker: const DefaultLocationMarker(
