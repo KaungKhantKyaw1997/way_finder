@@ -49,6 +49,9 @@ class MapButtons extends StatelessWidget {
                 size: 16,
               ),
             ),
+            const SizedBox(
+              height: 4,
+            ),
             FloatingActionButton(
               mini: true,
               elevation: 0.1,
