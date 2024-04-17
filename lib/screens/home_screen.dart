@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:location/location.dart';
 import 'package:way_finder/app.dart';
@@ -303,44 +304,43 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ),
                   ],
                 ),
-                CircleLayer(
-                  circles: [
-                    CircleMarker(
-                      point: LatLng(latitude, longitude),
-                      color: const Color(0xff007AFF),
-                      borderColor: Colors.white,
-                      borderStrokeWidth: 3,
-                      useRadiusInMeter: true,
-                      radius: 10,
+                CurrentLocationLayer(
+                  alignPositionOnUpdate: AlignOnUpdate.always,
+                  alignDirectionOnUpdate: AlignOnUpdate.never,
+                  style: const LocationMarkerStyle(
+                    marker: DefaultLocationMarker(
+                      color: Colors.white,
+                      child: Icon(
+                        Icons.navigation_rounded,
+                        color: Color(0xFF2196F3),
+                        size: 17,
+                      ),
                     ),
-                    CircleMarker(
-                      point: LatLng(latitude, longitude),
-                      color: const Color(0xff007AFF).withOpacity(0.4),
-                      borderStrokeWidth: 0,
-                      useRadiusInMeter: true,
-                      radius: 70,
-                    ),
-                  ],
+                    markerSize: Size(25, 25),
+                    markerDirection: MarkerDirection.heading,
+                  ),
                 ),
-                CircleLayer(
-                  circles: [
-                    CircleMarker(
-                      point: LatLng(endLatitude, endLongitude),
-                      color: const Color(0xffCE534C),
-                      borderColor: Colors.white,
-                      borderStrokeWidth: 3,
-                      useRadiusInMeter: true,
-                      radius: 10,
+                LocationMarkerLayer(
+                  position: LocationMarkerPosition(
+                    latitude: endLatitude,
+                    longitude: endLongitude,
+                    accuracy: 10,
+                  ),
+                  style: LocationMarkerStyle(
+                    marker: const DefaultLocationMarker(
+                      color: Colors.white,
+                      child: Icon(
+                        Icons.location_on_rounded,
+                        color: Color(0xffCE534C),
+                        size: 17,
+                      ),
                     ),
-                  ],
+                    showHeadingSector: false,
+                    markerSize: const Size(25, 25),
+                    accuracyCircleColor:
+                        const Color(0xffCE534C).withOpacity(0.1),
+                  ),
                 ),
-                // MarkerLayer(
-                //   markers: [
-                //     buildEndPin(
-                //       LatLng(endLatitude, endLongitude),
-                //     ),
-                //   ],
-                // ),
                 MapButtons(
                   mapController: mapController,
                   minZoom: 4,
