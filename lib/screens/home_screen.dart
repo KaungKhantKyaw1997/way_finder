@@ -261,15 +261,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  Marker buildEndPin(LatLng point) => Marker(
-        point: point,
-        width: 30,
-        height: 30,
-        child: SvgPicture.asset(
-          "assets/icons/end_location.svg",
-        ),
-      );
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -298,8 +289,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   polylines: [
                     Polyline(
                       points: directions,
-                      strokeWidth: 10,
-                      color: const Color(0xff60B593).withOpacity(0.5),
+                      strokeWidth: 8,
+                      color: const Color(0xFF5B55FE).withOpacity(0.3),
                       borderStrokeWidth: 0,
                     ),
                   ],
@@ -307,17 +298,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 CurrentLocationLayer(
                   alignPositionOnUpdate: AlignOnUpdate.once,
                   alignDirectionOnUpdate: AlignOnUpdate.never,
-                  style: const LocationMarkerStyle(
-                    marker: DefaultLocationMarker(
+                  style: LocationMarkerStyle(
+                    marker: const DefaultLocationMarker(
                       color: Colors.white,
                       child: Icon(
                         Icons.navigation_rounded,
-                        color: Color(0xFF2196F3),
+                        color: Color(0xFF5B55FE),
                         size: 17,
                       ),
                     ),
-                    markerSize: Size(25, 25),
+                    markerSize: const Size(25, 25),
                     markerDirection: MarkerDirection.heading,
+                    accuracyCircleColor:
+                        const Color(0xFFDFDFDF).withOpacity(0.6),
+                    headingSectorColor: const Color(0xFF5B55FE),
                   ),
                 ),
                 LocationMarkerLayer(
@@ -331,14 +325,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       color: Colors.white,
                       child: Icon(
                         Icons.location_on_rounded,
-                        color: Color(0xffCE534C),
+                        color: Color(0xffF3BF42),
                         size: 17,
                       ),
                     ),
                     showHeadingSector: false,
                     markerSize: const Size(25, 25),
                     accuracyCircleColor:
-                        const Color(0xffCE534C).withOpacity(0.1),
+                        const Color(0xFFDFDFDF).withOpacity(0.6),
                   ),
                 ),
                 MapButtons(
@@ -426,7 +420,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         ),
                         border: checkCar
                             ? Border.all(
-                                color: const Color(0xff007AFF),
+                                color: const Color(0xFF5B55FE),
                                 width: 0.5,
                               )
                             : null,
@@ -434,7 +428,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       width: double.infinity,
                       child: FloatingActionButton(
                         elevation: 0.1,
-                        backgroundColor: Colors.white,
+                        backgroundColor:
+                            checkCar ? const Color(0xffE5E5F3) : Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
@@ -450,7 +445,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         child: SvgPicture.asset(
                           'assets/icons/car.svg',
                           colorFilter: ColorFilter.mode(
-                            checkCar ? const Color(0xff007AFF) : Colors.black,
+                            checkCar ? const Color(0xFF5B55FE) : Colors.black,
                             BlendMode.srcIn,
                           ),
                         ),
@@ -468,7 +463,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         ),
                         border: checkBicycle
                             ? Border.all(
-                                color: const Color(0xff007AFF),
+                                color: const Color(0xFF5B55FE),
                                 width: 0.5,
                               )
                             : null,
@@ -476,7 +471,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       width: double.infinity,
                       child: FloatingActionButton(
                         elevation: 0.1,
-                        backgroundColor: Colors.white,
+                        backgroundColor: checkBicycle
+                            ? const Color(0xffE5E5F3)
+                            : Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
@@ -493,7 +490,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           'assets/icons/bicycle.svg',
                           colorFilter: ColorFilter.mode(
                             checkBicycle
-                                ? const Color(0xff007AFF)
+                                ? const Color(0xFF5B55FE)
                                 : Colors.black,
                             BlendMode.srcIn,
                           ),
@@ -512,7 +509,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         ),
                         border: checkFoot
                             ? Border.all(
-                                color: const Color(0xff007AFF),
+                                color: const Color(0xFF5B55FE),
                                 width: 0.5,
                               )
                             : null,
@@ -520,7 +517,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       width: double.infinity,
                       child: FloatingActionButton(
                         elevation: 0.1,
-                        backgroundColor: Colors.white,
+                        backgroundColor:
+                            checkFoot ? const Color(0xffE5E5F3) : Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
@@ -536,7 +534,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         child: SvgPicture.asset(
                           'assets/icons/foot.svg',
                           colorFilter: ColorFilter.mode(
-                            checkFoot ? const Color(0xff007AFF) : Colors.black,
+                            checkFoot ? const Color(0xFF5B55FE) : Colors.black,
                             BlendMode.srcIn,
                           ),
                         ),
