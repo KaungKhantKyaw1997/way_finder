@@ -48,10 +48,10 @@ class _SplashScreenState extends State<SplashScreen> {
                   ),
                   shape: BoxShape.circle,
                 ),
-                child: const SpinKitWaveSpinner(
-                  color: Color(0xFF5B55FE),
-                  waveColor: Colors.transparent,
-                  trackColor: Color(0xFFDFDFDF),
+                child: SpinKitWaveSpinner(
+                  color: const Color(0xFF5B55FE).withOpacity(0.5),
+                  waveColor: const Color(0xFF5B55FE).withOpacity(0.2),
+                  trackColor: const Color(0xFFDFDFDF),
                   size: 200,
                 ),
               ),
