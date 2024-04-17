@@ -1,14 +1,12 @@
-// ignore_for_file: unnecessary_null_comparison
+// ignore_for_file: avoid_print
 
 import 'package:location/location.dart';
 
 final Location location = Location();
-// double latitude = 16.84630;
-// double longitude = 96.13210;
 double latitude = 0.0;
 double longitude = 0.0;
 
-Future<void> getLocation() async {
+Future<void> requestLocation() async {
   try {
     bool serviceEnabled;
     serviceEnabled = await location.serviceEnabled();
@@ -25,12 +23,6 @@ Future<void> getLocation() async {
       if (permission != PermissionStatus.granted) {
         return;
       }
-    }
-
-    LocationData? locationData = await location.getLocation();
-    if (locationData != null) {
-      latitude = locationData.latitude!;
-      longitude = locationData.longitude!;
     }
   } catch (e) {
     print('Error getting location: $e');
