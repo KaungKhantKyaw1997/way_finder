@@ -1,4 +1,4 @@
-# Way Finder
+# way_finder
 
 Way Finder is a location-based application that helps users find their current location, search for places, calculate distances and durations between locations, and navigate through maps and directions.
 
