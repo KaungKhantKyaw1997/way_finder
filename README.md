@@ -1,6 +1,6 @@
 # Way Finder
 
-Created Way Finder, a location app enabling users to find their current location, search places, calculate distances, and navigate through maps.
+Created Way Finder, a location app that enables users to find their current location, search for places, calculate distances, and navigate through maps.
 
 ## Getting Started
 
