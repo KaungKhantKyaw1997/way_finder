@@ -6,43 +6,37 @@ Created Way Finder, a location app that enables users to find their current loca
 
 ### Requirements
 
----
-
 1. Ensure you have Flutter version 3.19.3 installed.
 2. Dart SDK should be available.
-3. (Optional) Consider using FVM (Flutter Version Management) for version control.
+3. (Optional) Consider using `FVM` (Flutter Version Management) for version control.
 
 ### Installation
 
----
+1. **Clone the repository to your local machine:**
 
-1. Clone the repository to your local machine:
+   ```
+   $ git clone https://github.com/KaungKhantKyaw1997/way_finder.git
+   ```
 
-```
-$ git clone https://github.com/KaungKhantKyaw1997/way_finder.git
-```
+2. **Navigate to the project directory:**
 
-2. Navigate to the project directory:
+   ```
+   $ cd way_finder
+   ```
 
-```
-$ cd way_finder
-```
+3. **Install dependencies:**
 
-3. Install dependencies:
+   ```
+   $ flutter pub get
+   ```
 
-```
-$ flutter pub get
-```
+4. **Run the application:**
 
-4. Run the application:
-
-```
-$ flutter run
-```
+   ```
+   $ flutter run
+   ```
 
 ### Platform Support
-
----
 
 Way Finder currently supports the following platforms:
 
@@ -52,14 +46,10 @@ Way Finder currently supports the following platforms:
 
 ### Tools Used
 
----
-
 1. **Open Street Map:** Utilized for detailed and up-to-date mapping data.
 2. **Open Route Service:** Integrated for accurate and reliable directions.
 
 ### Features
-
----
 
 1. **Current Location:** Instantly find your current location on the map.
 2. **Place Finder:** Easily search and locate any place of interest.
